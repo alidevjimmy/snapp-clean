@@ -1,0 +1,13 @@
+app:
+  name: snapp_clean
+  address: 127.0.0.1:8080
+postgres:
+  username: postgres
+  password: password
+  db_name: snapp_clean_db
+  host: 127.0.0.1
+  port: 3533
+account:
+  min_username_length: 20
+
+

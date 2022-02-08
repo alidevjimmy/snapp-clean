@@ -1,0 +1,54 @@
+version: "3.9"
+services:
+#  snapp_clean:
+#    build:
+#      context: .
+#      dockerfile: Dockerfile
+#    ports:
+#      - 8080:8080
+#    depends_on:
+#      postgres:
+#        condition: service_healthy
+#    volumes:
+#      - ./config.json:/app/config.json
+  swagger-ui:
+    image: swaggerapi/swagger-ui
+    ports:
+      - 3000:8080
+    volumes:
+      - ./:/usr/share/nginx/html/users/
+    environment:
+      SWAGGER_JSON: ./swagger.json
+  pgdb:
+    image: postgres
+    #    restart: always
+    environment:
+      POSTGRES_USER: ${POSTGRES_USERNAME}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    ports:
+      - ${POSTGRES_PORT}:5432
+    networks:
+      - pgnet
+      - appnet
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+  pgadmin:
+    image: dpage/pgadmin4
+    ports:
+      - ${PGADMIN_PORT}:80
+    #    restart: always
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD}
+    networks:
+      - pgnet
+    volumes:
+      - pgadmindata:/var/lib/postgresql/data
+networks:
+  pgnet:
+    driver: bridge
+  appnet:
+    driver: bridge
+volumes:
+  pgdata:
+  pgadmindata:
