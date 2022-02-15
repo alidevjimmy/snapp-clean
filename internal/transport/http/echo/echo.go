@@ -3,7 +3,9 @@ package echo
 
 import (
 	"context"
+	"github.com/alidevjimmy/snapp-clean/internal/pkg/logger"
 	"github.com/alidevjimmy/snapp-clean/internal/transport/http"
+	"github.com/alidevjimmy/snapp-clean/internal/transport/http/echo/controller"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"time"
@@ -11,12 +13,13 @@ import (
 
 type rest struct {
 	echo *echo.Echo
-	//user
+	user controller.UserController
 }
 
-func New() http.Rest {
+func New(logger logger.Logger) http.Rest {
 	return &rest{
 		echo : echo.New(),
+
 	}
 }
 

@@ -3,9 +3,11 @@ package cmd
 import (
 	"fmt"
 	"github.com/alidevjimmy/snapp-clean/internal/config"
+	"github.com/alidevjimmy/snapp-clean/internal/pkg/logger/zap"
 	"github.com/alidevjimmy/snapp-clean/internal/repository/postgres"
 	"github.com/alidevjimmy/snapp-clean/internal/transport/http/echo"
 	"github.com/urfave/cli/v2"
+	"go.uber.org/zap/zapcore"
 	"os"
 	"os/signal"
 	"syscall"
@@ -25,21 +27,26 @@ func serve(ctx *cli.Context) error {
 	if err := config.ReadYaml("config.yaml", cfg); err != nil {
 		panic(err)
 	}
-	// log stuff
 
-	postgresRepo, err := postgres.New(cfg.Postgres)
+	f , err := os.OpenFile("logs/app.log", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
+	if err != nil {
+		return err
+	}
+
+	logger := zap.New(f, zapcore.ErrorLevel)
+
+	postgresRepo, err := postgres.New(cfg.Postgres, logger)
 	if err != nil {
 		panic(err)
 	}
 	_ = postgresRepo
 
-	// send postgresRepo to userService
+	// send postgresRepo & logger to userService
 
 	restServer := echo.New()
 	go func() {
 		if err := restServer.Start(cfg.App.Address); err != nil {
-			//logfer
-			panic(err)
+			logger.Error(fmt.Sprintf("error while serving: %v", err))
 		}
 	}()
 

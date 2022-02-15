@@ -4,16 +4,17 @@ import (
 	"context"
 	"fmt"
 	"github.com/alidevjimmy/snapp-clean/internal/config"
+	"github.com/alidevjimmy/snapp-clean/internal/pkg/logger"
 	"github.com/alidevjimmy/snapp-clean/internal/repository"
 	"github.com/jackc/pgx/v4"
 )
 
 type postgres struct {
 	db *pgx.Conn
-	//logger logger.Logger
+	logger logger.Logger
 }
 
-func New(cfg config.Postgres) (repository.Postgres, error) {
+func New(cfg config.Postgres, logger logger.Logger) (repository.Postgres, error) {
 	db , err := pgx.Connect(context.Background(), dsn(cfg))
 	if err != nil {
 		// log
@@ -22,6 +23,7 @@ func New(cfg config.Postgres) (repository.Postgres, error) {
 	defer db.Close(context.Background())
 	return &postgres{
 		db: db,
+		logger: logger,
 	}, nil
 }
 
